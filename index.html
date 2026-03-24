@@ -7,11 +7,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-primary: #0f0a1e;
-    --bg-card: #1a1232;
-    --bg-row: #1e1540;
-    --bg-row-alt: #231a4a;
-    --bg-top1: linear-gradient(135deg, #ff8c00 0%, #e65100 100%);
+    --bg-primary: transparent;
+    --bg-card: rgba(15, 10, 40, 0.4);
+    --bg-row: rgba(20, 15, 50, 0.5);
+    --bg-row-alt: rgba(25, 18, 55, 0.5);
+    --bg-top1: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
     --bg-top2: linear-gradient(135deg, #b0bec5 0%, #78909c 100%);
     --bg-top3: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%);
     --accent: #ff8c00;
@@ -29,33 +29,20 @@
 
   body {
     font-family: 'Outfit', sans-serif;
-    background: var(--bg-primary);
+    background: transparent;
     color: var(--text-primary);
-    min-height: 100vh;
+    min-height: auto;
     overflow-x: hidden;
   }
 
   .bg-effects {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
-    z-index: 0;
+    display: none;
   }
   .bg-effects::before {
-    content: '';
-    position: absolute;
-    top: -30%; left: -20%;
-    width: 60%; height: 60%;
-    background: radial-gradient(circle, rgba(255, 140, 0, 0.08) 0%, transparent 70%);
-    animation: float 20s ease-in-out infinite;
+    display: none;
   }
   .bg-effects::after {
-    content: '';
-    position: absolute;
-    bottom: -20%; right: -10%;
-    width: 50%; height: 50%;
-    background: radial-gradient(circle, rgba(138, 43, 226, 0.06) 0%, transparent 70%);
-    animation: float 25s ease-in-out infinite reverse;
+    display: none;
   }
   @keyframes float {
     0%, 100% { transform: translate(0, 0); }
@@ -141,8 +128,8 @@
   /* Top 3 special */
   .row.top-1 {
     background: var(--bg-top1);
-    border: 1px solid rgba(255, 140, 0, 0.4);
-    box-shadow: 0 4px 24px rgba(255, 140, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    box-shadow: 0 4px 24px rgba(255, 215, 0, 0.2);
   }
   .row.top-2 {
     background: var(--bg-top2);
