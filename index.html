@@ -357,6 +357,17 @@ function render() {
 }
 
 render();
+
+// Auto-resize iframe — communicate height to parent
+function notifyParentHeight() {
+  const height = document.body.scrollHeight + 20;
+  window.parent.postMessage({ type: 'ig-leaderboard-height', height: height }, '*');
+}
+notifyParentHeight();
+window.addEventListener('resize', notifyParentHeight);
+// Retry after animations settle
+setTimeout(notifyParentHeight, 500);
+setTimeout(notifyParentHeight, 1500);
 </script>
 </body>
 </html>
