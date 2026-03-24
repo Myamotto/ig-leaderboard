@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infopreneur Games — Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0f0a1e;
+    --bg-card: #1a1232;
+    --bg-row: #1e1540;
+    --bg-row-alt: #231a4a;
+    --bg-top1: linear-gradient(135deg, #ff8c00 0%, #e65100 100%);
+    --bg-top2: linear-gradient(135deg, #b0bec5 0%, #78909c 100%);
+    --bg-top3: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%);
+    --accent: #ff8c00;
+    --accent-glow: rgba(255, 140, 0, 0.3);
+    --text-primary: #ffffff;
+    --text-secondary: #a99ec4;
+    --text-muted: #6b5f8a;
+    --border: rgba(255, 255, 255, 0.06);
+    --gold: #ffd700;
+    --silver: #c0c0c0;
+    --bronze: #cd7f32;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .bg-effects {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-effects::before {
+    content: '';
+    position: absolute;
+    top: -30%; left: -20%;
+    width: 60%; height: 60%;
+    background: radial-gradient(circle, rgba(255, 140, 0, 0.08) 0%, transparent 70%);
+    animation: float 20s ease-in-out infinite;
+  }
+  .bg-effects::after {
+    content: '';
+    position: absolute;
+    bottom: -20%; right: -10%;
+    width: 50%; height: 50%;
+    background: radial-gradient(circle, rgba(138, 43, 226, 0.06) 0%, transparent 70%);
+    animation: float 25s ease-in-out infinite reverse;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, -20px); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 24px 16px 40px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), #e65100);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #a99ec4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+  .header .subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  .header .week-info {
+    display: inline-block;
+    margin-top: 12px;
+    background: rgba(255, 140, 0, 0.1);
+    border: 1px solid rgba(255, 140, 0, 0.2);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Leaderboard */
+  .leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 44px 1fr 72px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--bg-row);
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .row:nth-child(even) { background: var(--bg-row-alt); }
+  .row:hover {
+    transform: translateX(4px);
+    box-shadow: -4px 0 20px var(--accent-glow);
+  }
+
+  /* Top 3 special */
+  .row.top-1 {
+    background: var(--bg-top1);
+    border: 1px solid rgba(255, 140, 0, 0.4);
+    box-shadow: 0 4px 24px rgba(255, 140, 0, 0.15);
+  }
+  .row.top-2 {
+    background: var(--bg-top2);
+    border: 1px solid rgba(176, 190, 197, 0.3);
+  }
+  .row.top-3 {
+    background: var(--bg-top3);
+    border: 1px solid rgba(205, 127, 50, 0.3);
+  }
+  .row.top-1 .rank, .row.top-2 .rank, .row.top-3 .rank {
+    font-size: 20px;
+  }
+
+  .rank {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .row.top-1 .rank, .row.top-2 .rank, .row.top-3 .rank {
+    color: #fff;
+  }
+
+  .player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 8px;
+  }
+  .player-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text-primary);
+  }
+  .player-weeks {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .week-dot {
+    display: inline-block;
+    width: 18px;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.1);
+  }
+  .week-dot.active { background: var(--accent); }
+  .week-dot.zero { background: rgba(255,80,80,0.3); }
+
+  .score {
+    text-align: right;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--accent);
+  }
+  .row.top-1 .score, .row.top-2 .score, .row.top-3 .score {
+    color: #fff;
+  }
+  .score span {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    display: block;
+  }
+  .row.top-1 .score span, .row.top-2 .score span, .row.top-3 .score span {
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Animations */
+  .row {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: slideIn 0.4s ease forwards;
+  }
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .container { padding: 16px 10px 32px; }
+    .header h1 { font-size: 22px; }
+    .row { grid-template-columns: 36px 1fr 60px; padding: 10px 12px; }
+    .player-name { font-size: 13px; }
+    .score { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-effects"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">🏆 Saison 2</div>
+    <h1>Infopreneur Games</h1>
+    <div class="subtitle">Classement général</div>
+    <div class="week-info" id="weekInfo"></div>
+  </div>
+  <div class="leaderboard" id="leaderboard"></div>
+  <div class="footer">
+    Mis à jour chaque mardi — <a href="https://packie.io/incubateur" target="_blank">Rejoindre l'Incubateur</a>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 📊 DONNÉES — METTRE À JOUR CHAQUE SEMAINE ICI
+// Ajouter les scores /25 pour chaque nouvelle semaine
+// Mettre null si pas de livrable rendu
+// ═══════════════════════════════════════════════════════
+
+const CURRENT_WEEK = 2;
+const TOTAL_WEEKS = 10;
+
+const players = [
+  { name: "Isabelle Weber",      scores: [22, 25] },
+  { name: "Sonia Chhuy",         scores: [25, 24] },
+  { name: "Anne Saulais",        scores: [15, 24] },
+  { name: "Véronique Poirier",   scores: [24, 22] },
+  { name: "Sophie Biboud",       scores: [21, 22] },
+  { name: "Leslie Gilli",        scores: [23, 23] },
+  { name: "Christine Mouaya",    scores: [23, 21] },
+  { name: "Daphnee Broca",       scores: [15, 21] },
+  { name: "Kahina Ikeni",        scores: [23, 17] },
+  { name: "Vincent Bertin",      scores: [25, 18] },
+  { name: "Pauline Bonfils",     scores: [19, 20] },
+  { name: "Marie Descamps",      scores: [16, 20] },
+  { name: "Harald Beyer",        scores: [17, 20] },
+  { name: "Ibrahima Diabakhate", scores: [13, 19] },
+  { name: "Christophe Diringer", scores: [19, null] },
+  { name: "Beatrice Mckinney",   scores: [20, 12] },
+  { name: "Anna Vaccaro",        scores: [16, 7] },
+  { name: "Cyr Zachee",          scores: [12, 13] },
+  { name: "Jean-J. Rananjason",  scores: [15, 12] },
+  { name: "Leslie Vauthier",     scores: [14, null] },
+  { name: "Denis Ralevitch",     scores: [6, 10] },
+  { name: "Eudeline Paulus",     scores: [23, null] },
+  { name: "Christine Tendon",    scores: [13, null] },
+  { name: "Marie-Hélène Briat",  scores: [18, null] },
+  { name: "Laurent Ménestret",   scores: [11, null] },
+  { name: "Christian Collignon", scores: [null, 10] },
+  { name: "Joana Carter",        scores: [7, null] },
+  { name: "Gaëlle Haidar",       scores: [10, null] },
+  { name: "Jacqueline Piché",    scores: [11, null] },
+  { name: "Robert Benjamin",     scores: [null, null] },
+  { name: "Emmanuelle Pellet",   scores: [null, null] },
+];
+
+// ═══════════════════════════════════════════════════════
+// 🔧 LOGIQUE — NE PAS TOUCHER
+// ═══════════════════════════════════════════════════════
+
+function computeLeaderboard() {
+  return players.map(p => {
+    const total = p.scores.reduce((sum, s) => sum + (s || 0), 0);
+    const weeks = p.scores.filter(s => s !== null).length;
+    return { ...p, total, weeks };
+  })
+  .sort((a, b) => b.total - a.total || b.weeks - a.weeks)
+  .filter(p => p.total > 0);
+}
+
+function render() {
+  const sorted = computeLeaderboard();
+  const container = document.getElementById('leaderboard');
+  const weekInfo = document.getElementById('weekInfo');
+
+  weekInfo.textContent = `Semaine ${CURRENT_WEEK} / ${TOTAL_WEEKS} complétée`;
+
+  container.innerHTML = sorted.map((p, i) => {
+    const rank = i + 1;
+    const topClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
+    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+
+    const weekDots = Array.from({ length: TOTAL_WEEKS }, (_, wi) => {
+      if (wi >= p.scores.length) return '<span class="week-dot"></span>';
+      if (p.scores[wi] === null) return '<span class="week-dot zero"></span>';
+      return '<span class="week-dot active"></span>';
+    }).join('');
+
+    return `
+      <div class="row ${topClass}" style="animation-delay: ${i * 0.05}s">
+        <div class="rank">${medal}</div>
+        <div class="player-info">
+          <div class="player-name">${p.name}</div>
+          <div class="player-weeks">${weekDots}</div>
+        </div>
+        <div class="score">
+          ${p.total}
+          <span>pts</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+render();
+</script>
+</body>
+</html>
